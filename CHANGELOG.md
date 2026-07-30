@@ -21,6 +21,9 @@ The project uses semantic versioning where practical. Pre-release status does no
 - PostgreSQL 16 service in GitHub Actions for clean migration lifecycle verification
 - CI steps for Alembic upgrade, current-head inspection, schema-drift check, downgrade to base, re-upgrade, and backend tests
 - Manual `workflow_dispatch` support for backend verification
+- Reusable `backend/scripts/verify_backend.sh` verification entry point
+- Markdown verification report with first-failure capture
+- GitHub Actions Summary publishing and 30-day verification artifact retention
 
 ### Changed
 
@@ -30,16 +33,16 @@ The project uses semantic versioning where practical. Pre-release status does no
 - CI now installs explicit test dependencies, compiles backend and migration code, and runs tests with the correct `PYTHONPATH`.
 - Placeholder check-in coverage was replaced with real assertions.
 - Alembic no longer contains a fixed sample credential URL and now requires environment configuration.
+- Alembic logging initialization is skipped safely when the minimal configuration has no logging sections.
 - Migration documentation now defines review, upgrade, downgrade, and evidence requirements.
 - Backend CI was renamed to `Backend Verification` to reflect migration and test coverage.
-- Alembic logging initialization now runs only when logging sections exist, preventing startup failure with the minimal credential-free `alembic.ini`.
+- CI now delegates verification to one reusable script rather than duplicating commands in workflow YAML.
 
 ### Known limitations
 
 - A passing current-head CI result is not yet recorded.
 - The PostgreSQL migration workflow is implemented but its successful execution has not been verified.
-- The connector did not expose a push-based workflow run for the inspected commits, and the audit runtime could not clone GitHub because DNS resolution was unavailable.
-- Several relational-looking columns remain without Foreign Key constraints because the current SQLAlchemy models do not declare them.
+- Several relational-looking columns remain without Foreign Key constraints because current SQLAlchemy models do not declare them.
 - Telegram, payment provider, VPS, DNS, TLS, backup restore, rollback, and UAT are not verified in target environments.
 - Service-level tests do not yet verify real database-backed API transactions or concurrent check-in behavior.
 
