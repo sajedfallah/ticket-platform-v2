@@ -10,18 +10,19 @@ Professional event ticketing platform for concerts, music, festivals and enterta
 - Admin Dashboard
 - Docker deployment
 
-## MVP Features
+## Current Progress
 
-- Event management
-- Ticket types
-- Orders
-- Manual payment verification
-- QR tickets
-- Admin dashboard
+Phase 1 Backend Foundation completed:
+
+- Configuration layer
+- PostgreSQL connection layer
+- SQLAlchemy base setup
+- Backend dependency setup
 
 ## Roadmap
 
 Phase 1: Backend foundation
-Phase 2: Telegram Bot
-Phase 3: Mini App
-Phase 4: Organizer marketplace
+Phase 2: Database models and APIs
+Phase 3: Telegram Bot
+Phase 4: Mini App
+Phase 5: Organizer marketplace
