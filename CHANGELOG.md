@@ -16,6 +16,8 @@ The project uses semantic versioning where practical. Pre-release status does no
 - Project `VERSION` file
 - Backend development test requirements in `backend/requirements-dev.txt`
 - Meaningful service-level tests for idempotent ticket issuance, single-use check-in, and unknown-ticket rejection
+- Executable Alembic online/offline migration environment driven by `DATABASE_URL`
+- Reviewed initial migration revision in `backend/migrations/versions/20260730_0001_initial_schema.py`
 
 ### Changed
 
@@ -24,11 +26,15 @@ The project uses semantic versioning where practical. Pre-release status does no
 - Backend GitHub Actions workflow now runs from the correct `backend/` directory.
 - CI now installs explicit test dependencies, compiles the backend, and runs tests with the correct `PYTHONPATH`.
 - Placeholder check-in coverage was replaced with real assertions.
+- Alembic no longer contains a fixed sample credential URL and now requires environment configuration.
+- Migration documentation now defines review, upgrade, downgrade, and evidence requirements.
 
 ### Known limitations
 
 - A passing current-head CI result is not yet recorded.
-- Complete Alembic migration path is not yet verified.
+- The initial migration revision has not yet been executed against clean PostgreSQL.
+- Downgrade/re-upgrade and schema-drift checks are not yet verified.
+- Several relational-looking columns remain without Foreign Key constraints because the current SQLAlchemy models do not declare them.
 - Telegram, payment provider, VPS, DNS, TLS, backup restore, rollback, and UAT are not verified in target environments.
 - Service-level tests do not yet verify real PostgreSQL transactions or concurrent check-in behavior.
 
