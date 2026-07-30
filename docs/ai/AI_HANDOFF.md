@@ -2,95 +2,74 @@
 
 ## Objective
 
-Stabilize the repository, preserve truthful project memory, and verify the backend and database lifecycle before any new feature or VPS deployment work.
+Move Ticket Platform v2 quickly from repository stabilization into an executable MVP while preserving truthful project memory.
 
 ## Work Completed
 
 - Established repository-first documentation, Current Project State, architecture, roadmap, AI context, bootstrap, master prompt, and handoff files.
-- Audited and repaired backend CI paths and explicit test dependencies.
-- Replaced placeholder check-in coverage with real assertions for idempotent issuance, single-use check-in, and unknown-ticket rejection.
-- Replaced the Alembic placeholder with executable online/offline migration support driven by `DATABASE_URL`.
-- Removed fixed sample database credentials from `backend/alembic.ini`.
-- Added a reviewed initial migration matching all currently declared SQLAlchemy models.
-- Added PostgreSQL 16-backed migration lifecycle checks to GitHub Actions.
-- Fixed Alembic startup so missing optional logging sections do not crash migration execution.
-- Added `backend/scripts/verify_backend.sh` as the canonical verification entry point for local and CI use.
-- Added first-failure capture, GitHub Step Summary publishing, and a retained verification-report artifact.
+- Added PostgreSQL-backed backend verification, Alembic lifecycle checks, first-failure reporting, GitHub Summary output, and retained verification artifacts.
+- Added an executable initial database migration matching current SQLAlchemy models.
+- Added `backend/app/services/mvp_flow_service.py` with seeded event catalog and validated in-memory order lifecycle.
+- Replaced placeholder event and order endpoints with executable API behavior.
+- Connected mock payment creation to actual order amount and currency.
+- Connected payment verification to order status updates and ticket fulfillment.
+- Added a complete service-level MVP journey test: event → order → payment → ticket → check-in.
 
-## Files Changed or Added
+## Main Files Changed
 
-- `.github/workflows/backend-test.yml`
-- `backend/requirements-dev.txt`
+- `backend/app/services/mvp_flow_service.py`
+- `backend/app/api/events_crud.py`
+- `backend/app/api/order_flow.py`
+- `backend/app/api/payments.py`
+- `tests/integration/test_mvp_purchase_flow.py`
 - `backend/scripts/verify_backend.sh`
-- `tests/integration/test_payment_ticket_checkin_flow.py`
-- `backend/alembic.ini`
-- `backend/migrations/env.py`
-- `backend/migrations/README.md`
-- `backend/migrations/versions/20260730_0001_initial_schema.py`
+- `.github/workflows/backend-test.yml`
 - `docs/project/current-state.md`
 - `CHANGELOG.md`
 - `docs/ai/AI_HANDOFF.md`
-- Repository governance and architecture documents listed in `docs/index.md`
 
-## Key Findings
+## Executable API Journey
 
-- The repository is pre-beta, not a verified beta release.
-- The initial migration mirrors constraints explicitly declared by current models.
-- Multiple relational-looking columns are plain integers without Foreign Key constraints; this is documented technical debt.
-- The verification workflow now produces durable evidence even when a step fails.
-- No successful current-head workflow run has yet been inspected.
-- The connector view used during this work did not expose push-based runs, and the audit execution environment could not clone GitHub because network resolution failed.
+1. `GET /api/events`
+2. `GET /api/events/{event_id}`
+3. `POST /api/orders`
+4. `POST /api/payments/create`
+5. `POST /api/payments/verify`
+6. `GET /api/tickets/order/{order_id}`
+7. `POST /api/tickets/validate`
+8. `POST /api/tickets/check-in`
 
-## Verification Performed
+## Critical Truths
 
-- Inspected repository metadata, workflow, requirements, application bootstrap, services, tests, Alembic configuration, migration revision, and every current SQLAlchemy model through the GitHub connector.
-- Compared migration definitions with model columns, nullability, unique constraints, indexes, and declared Foreign Keys.
-- Corrected evidence-backed CI, test, Alembic, and reporting defects.
+- The first backend product journey is implemented but has not yet been proven passing in a retrieved GitHub Actions run.
+- Events, orders, mock payments, and issued tickets are process-local/in-memory and disappear after restart.
+- The current in-memory flow is appropriate for first boot, Swagger testing, Mini App wiring, and demos only.
+- Do not deploy multiple backend workers with this process-local state.
+- PostgreSQL repository integration, transaction-backed order/payment/ticket behavior, and concurrent check-in protection are still required.
 
-## Tests Not Yet Executed or Proven Passing
+## Tests Not Yet Proven Passing
 
-- `Backend Verification` on current head
-- PostgreSQL 16 clean `alembic upgrade head`
-- `alembic check` with no schema drift
-- `alembic downgrade base` followed by re-upgrade
-- Backend pytest execution in GitHub Actions
+- Current-head `Backend Verification`
+- PostgreSQL migration upgrade/check/downgrade/re-upgrade
+- New complete MVP purchase journey test
 - Database-backed API integration tests
-- Concurrent check-in protection
-- Docker Compose build and application health checks
-- Telegram bot and Mini App builds
-- Admin panel build
-- Real payment-provider flow
+- Mini App build and connected purchase flow
+- Telegram init-data validation
+- Docker runtime and health checks
 - VPS/DNS/TLS deployment
-- Backup restore and rollback
-- End-to-end UAT
-
-## Current Blockers
-
-- No passing current-head `Backend Verification` result has been recorded.
-- No verification artifact or job summary from a completed run has been inspected.
-- No target VPS or domain execution evidence exists.
-- No real Telegram or payment-provider configuration exists.
-- Authentication and authorization require audit.
 
 ## Exact Next Action
 
-1. Manually dispatch `Backend Verification` on the latest `main` head.
-2. Open the GitHub Actions Summary or download the `backend-verification-<sha>` artifact.
-3. Identify the first line marked `❌`.
-4. Fix only that evidence-backed root cause.
-5. Re-run verification.
-6. If all lines are marked `✅`, update `docs/project/current-state.md`, `CHANGELOG.md`, and this handoff to mark covered migration and service behaviors as `TESTED`.
-7. Preserve the run URL, commit SHA, artifact name, and result.
-8. Only then continue to Docker health checks and fail-fast deployment.
+Connect the Telegram Mini App to the executable event and purchase APIs:
 
-Do not mark migrations or tests `TESTED` without a successful PostgreSQL-backed workflow result. Do not add missing Foreign Keys silently; model and domain changes require an ADR and coordinated model/migration updates.
+1. Load `GET /api/events`.
+2. Display the seeded or created event and ticket price.
+3. Create an order with `POST /api/orders`.
+4. Create a mock payment with `POST /api/payments/create`.
+5. Complete the test payment with `POST /api/payments/verify`.
+6. Display the returned ticket code/QR state.
+7. Run `Backend Verification` and fix the first recorded failure before marking anything `TESTED`.
 
-## Required Human Inputs for Later Deployment
+After the connected Mini App demo works, replace `MVPFlowService` persistence with SQLAlchemy repositories rather than adding more in-memory features.
 
-- Domain and DNS access
-- VPS IP, OS, and SSH user
-- BotFather configuration
-- Payment provider and sandbox credentials
-- Business rules for refunds, settlements, and organizer onboarding
-
-Never place secrets in GitHub files, issues, commits, or chat.
+Never commit secrets or claim tests, deployment, Telegram connectivity, or production readiness without execution evidence.
