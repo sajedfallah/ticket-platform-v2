@@ -1,0 +1,61 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+
+  backend:
+    build:
+      context: ../backend
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    depends_on:
+      - postgres
+      - redis
+
+  telegram-bot:
+    build:
+      context: ../telegram-bot
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    depends_on:
+      - backend
+
+  mini-app:
+    build:
+      context: ../mini-app
+    restart: unless-stopped
+
+  admin-panel:
+    build:
+      context: ../admin-panel
+    restart: unless-stopped
+
+  nginx:
+    build:
+      context: ./nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - backend
+      - mini-app
+      - admin-panel
+
+volumes:
+  postgres_data:
+  redis_data:
