@@ -55,6 +55,76 @@ jobs:
           curl --fail --show-error --silent http://localhost:8080/api/events | tee proxied-events.json
           grep -q 'Ticket Platform Demo Event' proxied-events.json
 
+      - name: Execute purchase and ticket journey
+        run: |
+          python - <<'PY'
+          import json
+          import urllib.request
+
+          BASE = "http://localhost:8000/api"
+
+          def request(method, path, payload=None):
+              data = None
+              headers = {}
+              if payload is not None:
+                  data = json.dumps(payload).encode()
+                  headers["Content-Type"] = "application/json"
+              req = urllib.request.Request(BASE + path, data=data, headers=headers, method=method)
+              with urllib.request.urlopen(req, timeout=15) as response:
+                  return json.load(response)
+
+          events = request("GET", "/events")
+          event = events["items"][0]
+
+          order = request(
+              "POST",
+              "/orders",
+              {
+                  "user_id": 1001,
+                  "event_id": event["id"],
+                  "ticket_type_id": event["ticket_type_id"],
+                  "quantity": 1,
+              },
+          )
+
+          payment = request(
+              "POST",
+              "/payments/create",
+              {
+                  "order_id": order["id"],
+                  "callback_url": "http://localhost:8080/payment-result",
+              },
+          )
+
+          verified = request(
+              "POST",
+              "/payments/verify",
+              {"payment_id": payment["payment_id"], "success": True},
+          )
+
+          ticket = verified.get("ticket")
+          assert verified["order_status"] == "paid", verified
+          assert ticket and ticket["status"] == "active", verified
+
+          checked_in = request(
+              "POST",
+              "/tickets/check-in",
+              {"ticket_code": ticket["ticket_code"]},
+          )
+          assert checked_in["entry_allowed"] is True, checked_in
+
+          evidence = {
+              "event_id": event["id"],
+              "order_id": order["id"],
+              "payment_id": payment["payment_id"],
+              "ticket_code": ticket["ticket_code"],
+              "check_in": "accepted",
+          }
+          with open("purchase-flow.json", "w", encoding="utf-8") as handle:
+              json.dump(evidence, handle, indent=2)
+          print(json.dumps(evidence, indent=2))
+          PY
+
       - name: Write smoke summary
         if: always()
         run: |
@@ -63,9 +133,17 @@ jobs:
             echo
             echo '- Commit: `${{ github.sha }}`'
             echo '- Compose configuration: checked'
-            echo '- Backend target: `http://localhost:8000/health`'
-            echo '- Mini App target: `http://localhost:8080/`'
-            echo '- Mini App API proxy: `http://localhost:8080/api/events`'
+            echo '- Backend health: exercised'
+            echo '- Mini App shell and API proxy: exercised'
+            if [ -f purchase-flow.json ]; then
+              echo '- Purchase journey: event → order → mock payment → ticket → check-in exercised'
+              echo
+              echo '```json'
+              cat purchase-flow.json
+              echo '```'
+            else
+              echo '- Purchase journey: no success evidence produced'
+            fi
             echo
             docker compose ps || true
           } >> "$GITHUB_STEP_SUMMARY"
@@ -74,12 +152,18 @@ jobs:
         if: failure()
         run: docker compose logs --no-color > runtime-smoke.log
 
-      - name: Upload failure logs
-        if: failure()
+      - name: Upload runtime evidence
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: runtime-smoke-${{ github.sha }}
-          path: runtime-smoke.log
+          path: |
+            backend-health.json
+            events.json
+            proxied-events.json
+            purchase-flow.json
+            runtime-smoke.log
+          if-no-files-found: ignore
           retention-days: 30
 
       - name: Stop application
