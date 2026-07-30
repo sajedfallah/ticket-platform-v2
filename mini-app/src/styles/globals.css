@@ -1,0 +1,27 @@
+:root {
+  --bg: #0b0b12;
+  --card: #151522;
+  --text: #ffffff;
+  --accent: #d4af37;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, sans-serif;
+}
+
+.primary-button {
+  background: var(--accent);
+  color: #111;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 12px;
+}
+
+.ticket-card {
+  background: var(--card);
+  padding: 16px;
+  border-radius: 16px;
+}
