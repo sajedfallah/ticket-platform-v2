@@ -4,109 +4,84 @@
 - **Repository:** `sajedfallah/ticket-platform-v2`
 - **Default branch:** `main`
 - **Current version:** `0.2.0-prebeta`
-- **Current phase:** Repository stabilization and pre-beta verification
-- **Current sprint:** CI, migration lifecycle, database verification, and deployment readiness
-- **Last reviewed commit:** `c1e32e7bd240000f3f498ae135e4dbdd46364e53`
-- **Last updated:** 2026-07-30
+- **Current phase:** Fast-track MVP execution and pre-beta verification
+- **Current sprint:** First executable purchase journey, CI verification, and runtime readiness
+- **Last reviewed commit:** `26097bd27bb778c5fcac2cdb7b3c9e1bcc711ba1`
+- **Last updated:** 2026-07-31
 
 ## Executive Status
 
-The repository contains a substantial event-ticketing foundation: FastAPI routes, SQLAlchemy models and services, order/payment/ticket flows, QR check-in protections, Docker production configuration, Nginx routing, Certbot TLS bootstrap, repository governance, backend tests, an executable Alembic environment, an initial migration revision, and a PostgreSQL-backed GitHub Actions verification workflow.
+The backend now contains an executable first product journey: a seeded published event, event listing/detail/creation, validated order creation, mock payment creation tied to the real order amount, payment verification, ticket issuance, QR-code ticket lookup, and single-use check-in.
 
-The project is **not yet a verified beta release**. Verification is now centralized in `backend/scripts/verify_backend.sh`, which records each successful step and the first failed step in a Markdown report. GitHub Actions publishes that report to the run summary and retains it as an artifact. No successful workflow result has yet been recorded, so migration and test capabilities remain implemented rather than tested.
+This flow is currently backed by an in-memory MVP service. It is suitable for first boot, Swagger testing, Mini App integration, and product demonstrations, but data is lost when the backend process restarts. PostgreSQL repositories and transaction-backed concurrency remain required before beta deployment.
+
+The project is **not yet a verified beta release** because no successful current-head GitHub Actions run, Docker runtime test, Telegram integration test, or VPS deployment has been recorded.
 
 ## Capability Matrix
 
 | Capability | Status | Evidence / limitation |
 |---|---|---|
-| FastAPI application bootstrap | IMPLEMENTED | Application and router registration exist. |
-| Health route | IMPLEMENTED | Backend health router is registered; production behavior not yet verified. |
-| Event CRUD foundation | IMPLEMENTED | Router exists; authorization and production persistence require verification. |
-| Order lifecycle | IMPLEMENTED | Order model/service lifecycle states exist. |
-| Payment provider abstraction | IMPLEMENTED | Provider integration foundation exists; no real provider verified. |
-| Payment verification flow | IMPLEMENTED | API and fulfillment wiring exist; security/idempotency need full review. |
-| Ticket issuance | IMPLEMENTED | Fulfillment and ticket services exist. |
-| QR validation and duplicate check-in protection | IMPLEMENTED | Service and route logic exist; concurrent PostgreSQL behavior is not verified. |
-| Database models/session/transactions | IMPLEMENTED | SQLAlchemy foundations exist. |
-| Alembic runtime environment | IMPLEMENTED | Online/offline execution, model registration, environment-driven URL handling, and safe optional logging configuration exist. |
-| Initial migration revision | IMPLEMENTED | `20260730_0001_initial_schema.py` mirrors current model declarations. |
-| PostgreSQL migration verification workflow | IMPLEMENTED | CI provisions PostgreSQL 16 and invokes the reusable verification script. No passing result recorded. |
-| Verification report and artifact | IMPLEMENTED | Each run produces a step summary and retained Markdown artifact, including the first failed step. |
-| Clean migration lifecycle | BLOCKED | Workflow exists, but successful execution evidence is missing. |
-| Integration tests | IMPLEMENTED | Tests cover idempotent issuance, single-use check-in, and unknown tickets. |
-| Current-head automated tests | BLOCKED | Test code exists, but no passing current-head execution evidence has been recorded. |
-| GitHub Actions backend verification | IMPLEMENTED | Workflow includes PostgreSQL migration lifecycle, schema drift check, and backend tests; result unverified. |
-| Telegram bot | IMPLEMENTED | Container/service foundation exists; real token and behavior not verified. |
-| Telegram Mini App | IMPLEMENTED | Build/service foundation exists; product flow and production rendering not verified. |
-| Admin panel | IMPLEMENTED | Build/service foundation exists; authorization and production rendering not verified. |
-| Production Docker Compose | IMPLEMENTED | Services and volumes are defined; application health checks remain incomplete. |
-| Nginx routing | IMPLEMENTED | `/api`, `/app`, `/admin`, and health routing exist. |
-| TLS bootstrap | IMPLEMENTED | Certbot bootstrap and HTTPS template exist; real issuance not verified. |
-| VPS deployment | PLANNED | Runbook exists; no target VPS deployment evidence. |
-| Real DNS and domain | BLOCKED | Requires owner-provided domain and DNS changes. |
-| Real payment | BLOCKED | Requires provider selection, credentials, and sandbox verification. |
-| Beta UAT | PLANNED | Checklist exists; no executed test report. |
+| FastAPI application bootstrap | IMPLEMENTED | Application and routers exist. |
+| Health route | IMPLEMENTED | Production behavior not verified. |
+| Event catalog | IMPLEMENTED | Seeded demo event plus list, detail, and create endpoints. In-memory only. |
+| Order creation and lookup | IMPLEMENTED | Validates event, ticket type, quantity, capacity, and calculates total. In-memory only. |
+| Mock payment creation | IMPLEMENTED | Uses order amount/currency and rejects unknown or non-payable orders. |
+| Payment verification | IMPLEMENTED | Updates order status and issues a ticket after successful mock payment. |
+| Ticket issuance and lookup | IMPLEMENTED | Idempotent ticket issuance by order. In-memory only. |
+| QR validation and check-in | IMPLEMENTED | Active validation and duplicate check-in protection exist. |
+| First complete purchase journey test | IMPLEMENTED | Covers event → order → payment → ticket → check-in at service level. Passing CI not recorded. |
+| Database models and Alembic | IMPLEMENTED | Models, executable environment, and initial migration exist. |
+| PostgreSQL migration verification workflow | IMPLEMENTED | Upgrade, drift check, downgrade, re-upgrade, and pytest are configured. Result unverified. |
+| GitHub verification report | IMPLEMENTED | Summary and retained first-failure artifact are configured. |
+| Telegram bot | IMPLEMENTED | Foundation exists; real token and behavior unverified. |
+| Telegram Mini App | IMPLEMENTED | Build foundation exists; connection to new API flow remains next. |
+| Admin panel | IMPLEMENTED | Build foundation exists; real event-management flow unverified. |
+| Docker Compose and Nginx | IMPLEMENTED | Runtime health and target deployment remain unverified. |
+| VPS deployment | PLANNED | Runbook exists; not deployed. |
+
+## Executable MVP API Flow
+
+1. `GET /api/events`
+2. `GET /api/events/{event_id}`
+3. `POST /api/events`
+4. `POST /api/orders`
+5. `GET /api/orders/{order_id}`
+6. `POST /api/payments/create`
+7. `POST /api/payments/verify`
+8. `GET /api/tickets/order/{order_id}`
+9. `POST /api/tickets/validate`
+10. `POST /api/tickets/check-in`
 
 ## Current Priorities
 
-1. Run `Backend Verification` on the current `main` head.
-2. Inspect the generated Summary and `backend-verification-<sha>` artifact.
-3. Fix only the first evidence-backed failing step.
-4. Record exact PostgreSQL upgrade, drift-check, downgrade, re-upgrade, and pytest evidence.
-5. Add Docker health checks and a fail-fast deployment script after CI is green.
-6. Reconcile in-memory and database-backed order/payment/ticket flows.
-7. Review Telegram authentication, authorization, payment callbacks, and secret handling.
-8. Deploy to the target VPS only after CI and migration evidence are green.
-9. Execute and record limited beta UAT.
+1. Connect the Mini App to the executable event/order/payment/ticket endpoints.
+2. Run `Backend Verification` and fix the first evidence-backed failure.
+3. Replace in-memory MVP state with SQLAlchemy repositories and transactions.
+4. Add database-backed API integration tests and concurrent check-in protection.
+5. Add Docker health checks and fail-fast deployment behavior.
+6. Configure Telegram authentication and real BotFather settings.
+7. Deploy a limited beta only after CI and runtime evidence are green.
 
-## Known Issues and Risks
+## Known Issues and Technical Debt
 
-- No passing current-head CI run has been recorded yet.
-- The PostgreSQL verification workflow is implemented but has not produced recorded success evidence.
-- The connector view available during this audit did not expose push-based workflow runs.
-- The audit execution environment could not resolve `github.com`, so an independent clone-and-run verification could not be completed.
-- Several relational-looking columns are plain integers without Foreign Key constraints because current models do not declare those constraints.
-- The deployment system has been written but not executed on target infrastructure.
-- Certbot renewal may renew certificates without automatically reloading Nginx unless reload behavior is explicitly implemented and tested.
-- Some API/service flows may combine in-memory and database-backed behavior; this requires reconciliation.
-- Authentication and authorization coverage has not been proven.
-- Payment callback authenticity and idempotency require security verification.
-- Check-in duplicate protection must be tested under concurrent database-backed requests.
-- Secrets must remain outside Git and be rotated if previously exposed.
-
-## Technical Debt
-
-- Canonical API documentation is missing.
-- Canonical domain and database diagrams are missing.
-- ADR history is missing for major technology and deployment decisions.
-- Branch strategy and release process are not yet fully documented.
-- Frontend and bot tests are not evidenced.
-- Observability documentation exists, but operational metrics and alerting are not verified.
-- Test isolation does not yet cover database-backed API behavior or concurrent check-in.
-- The Alembic model import list must remain synchronized with `backend/app/models`.
-- Foreign Key coverage is incomplete across orders, payments, ticket types, order items, discounts, and check-ins.
+- In-memory events, orders, payments, and tickets are lost on restart.
+- The MVP service is process-local and unsuitable for multiple backend workers.
+- Database-backed API behavior and transaction isolation are not implemented end to end.
+- Multiple relational-looking model columns still lack Foreign Keys.
+- Authentication, authorization, Telegram init-data validation, and payment callback authenticity require audit.
+- No passing current-head CI result is recorded.
+- Docker, VPS, DNS, TLS issuance, backup restore, rollback, and UAT remain unverified.
 
 ## Environment Status
 
 | Environment | Status |
 |---|---|
-| Developer workstation | UNKNOWN |
-| GitHub Actions | POSTGRESQL VERIFICATION + REPORTING IMPLEMENTED; RESULT UNVERIFIED |
-| Ephemeral PostgreSQL 16 CI service | CONFIGURED; EXECUTION UNVERIFIED |
-| Audit execution environment | NETWORK BLOCKED FOR GITHUB CLONE |
+| GitHub Actions | VERIFICATION CONFIGURED; RESULT UNVERIFIED |
+| Local backend first boot | NOT RECORDED |
+| Mini App connected flow | NOT IMPLEMENTED |
 | Beta VPS | NOT DEPLOYED |
 | Production | NOT DEPLOYED |
 
-## Required Human Inputs
-
-- Target domain and DNS access
-- VPS IP, operating system, and SSH user
-- Telegram bot configuration through BotFather
-- Payment provider choice and sandbox credentials
-- Legal/business rules for refunds, organizer onboarding, and settlement
-
-Do not place passwords, bot tokens, private keys, payment secrets, or production `.env` content in documentation, issues, commits, or chat.
-
 ## Next Recommended Action
 
-Manually dispatch `Backend Verification` on the latest `main` head. Open the run Summary or download the `backend-verification-<sha>` artifact, then repair only the first failed step. If every recorded step passes, mark the covered migration lifecycle and backend service behaviors as `TESTED` and preserve the run URL and commit SHA as evidence.
+Connect the Mini App event list and purchase action to the new executable API flow. In parallel, manually dispatch `Backend Verification` on the latest `main` head and preserve the Summary or artifact as evidence.
