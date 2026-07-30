@@ -32,11 +32,13 @@ The project uses semantic versioning where practical. Pre-release status does no
 - Alembic no longer contains a fixed sample credential URL and now requires environment configuration.
 - Migration documentation now defines review, upgrade, downgrade, and evidence requirements.
 - Backend CI was renamed to `Backend Verification` to reflect migration and test coverage.
+- Alembic logging initialization now runs only when logging sections exist, preventing startup failure with the minimal credential-free `alembic.ini`.
 
 ### Known limitations
 
 - A passing current-head CI result is not yet recorded.
 - The PostgreSQL migration workflow is implemented but its successful execution has not been verified.
+- The connector did not expose a push-based workflow run for the inspected commits, and the audit runtime could not clone GitHub because DNS resolution was unavailable.
 - Several relational-looking columns remain without Foreign Key constraints because the current SQLAlchemy models do not declare them.
 - Telegram, payment provider, VPS, DNS, TLS, backup restore, rollback, and UAT are not verified in target environments.
 - Service-level tests do not yet verify real database-backed API transactions or concurrent check-in behavior.
