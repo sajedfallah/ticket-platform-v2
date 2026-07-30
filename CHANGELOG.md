@@ -17,12 +17,19 @@ The project uses semantic versioning where practical. Pre-release status does no
 - Validated order creation and lookup with quantity, capacity, amount, and currency calculation
 - Mock payment flow tied to actual order amount and status
 - First complete service-level purchase test covering event → order → payment → ticket → check-in
+- React/Vite Persian RTL Telegram Mini App under `mini-app/`
+- Connected Mini App journey for event selection, quantity, order creation, mock payment, ticket issuance, and QR display
+- Telegram WebApp SDK initialization and optional haptic feedback
+- Multi-stage Mini App Docker image and Nginx API proxy
+- Root Compose service for running the Mini App with Backend and PostgreSQL
+- Environment-driven Backend CORS configuration for local Mini App development
 
 ### Changed
 
 - Events and order endpoints no longer return placeholder responses.
 - Payment creation now requires an existing payable order and derives amount/currency from it.
 - Payment verification now updates the matching order before ticket fulfillment.
+- Docker Compose now includes persistent PostgreSQL storage and the Mini App service.
 - README and project-state documents distinguish implemented, tested, deployed, and verified work.
 - Alembic uses environment-driven credentials and safely handles minimal logging configuration.
 
@@ -30,8 +37,10 @@ The project uses semantic versioning where practical. Pre-release status does no
 
 - The executable MVP product flow is currently in memory and loses data on backend restart.
 - Process-local state is not safe for multiple workers or production deployment.
+- The Mini App production build and complete Docker runtime have not yet been executed and recorded.
+- Telegram init-data authenticity is not yet validated.
 - A passing current-head CI result is not yet recorded.
-- Database-backed API integration, concurrent check-in, Telegram authentication, real payment, VPS, DNS, TLS, backup restore, rollback, and UAT remain unverified.
+- Database-backed API integration, concurrent check-in, real payment, VPS, DNS, TLS, backup restore, rollback, and UAT remain unverified.
 - Several relational-looking model columns remain without Foreign Key constraints.
 
 ## Historical Work Before Documentation Baseline
