@@ -6,14 +6,14 @@
 - **Current version:** `0.2.0-prebeta`
 - **Current phase:** Repository stabilization and pre-beta verification
 - **Current sprint:** CI repair, test hardening, migration verification, and deployment readiness
-- **Last reviewed commit:** `465360cc6e2daa77384c9d16b60da28c76168054`
+- **Last reviewed commit:** `8352ceb468b6c095abefbf771b57ab9a519fb247`
 - **Last updated:** 2026-07-30
 
 ## Executive Status
 
-The repository contains a substantial event-ticketing foundation: FastAPI routes, SQLAlchemy models and services, order/payment/ticket flows, QR check-in protections, Docker production configuration, Nginx routing, Certbot TLS bootstrap, documentation governance, a backend CI workflow, and an executable Alembic environment.
+The repository contains a substantial event-ticketing foundation: FastAPI routes, SQLAlchemy models and services, order/payment/ticket flows, QR check-in protections, Docker production configuration, Nginx routing, Certbot TLS bootstrap, documentation governance, a backend CI workflow, an executable Alembic environment, and a reviewed initial migration revision matching the current model declarations.
 
-The project is **not yet a verified beta release**. The backend CI workflow and service-level tests have been repaired, and Alembic now loads all known model metadata and reads its connection string from `DATABASE_URL`. However, no passing current-head CI result or clean PostgreSQL migration result has yet been recorded.
+The project is **not yet a verified beta release**. The migration revision is implemented but has not been executed against a clean PostgreSQL database, downgraded, upgraded again, or compared with a fresh autogenerate result. No passing current-head CI result has been recorded.
 
 ## Capability Matrix
 
@@ -29,7 +29,8 @@ The project is **not yet a verified beta release**. The backend CI workflow and 
 | QR validation and duplicate check-in protection | IMPLEMENTED | Service and route logic exist; concurrent PostgreSQL behavior is not verified. |
 | Database models/session/transactions | IMPLEMENTED | SQLAlchemy foundations exist. |
 | Alembic runtime environment | IMPLEMENTED | Online/offline execution, model registration, logging, and environment-driven URL handling exist. |
-| Initial migration revision chain | BLOCKED | No reviewed initial revision has been generated and verified against clean PostgreSQL. |
+| Initial migration revision | IMPLEMENTED | `20260730_0001_initial_schema.py` mirrors the current model declarations; database execution is unverified. |
+| Clean migration lifecycle | BLOCKED | Upgrade, downgrade, re-upgrade, and autogenerate-diff evidence are not recorded. |
 | Integration tests | IMPLEMENTED | Tests cover idempotent issuance, single-use check-in, and unknown tickets. |
 | Current-head automated tests | BLOCKED | Test code exists, but no passing current-head execution evidence has been recorded. |
 | GitHub Actions backend CI | IMPLEMENTED | Workflow paths and test dependencies were corrected; a passing run is not yet verified. |
@@ -46,11 +47,11 @@ The project is **not yet a verified beta release**. The backend CI workflow and 
 
 ## Current Priorities
 
-1. Obtain a passing GitHub Actions run for the corrected backend workflow.
-2. Run the test suite from a clean environment and record exact output.
-3. Inventory all current SQLAlchemy models and reconcile duplicate/in-memory versus database-backed flows.
-4. Generate and manually review the initial Alembic revision.
-5. Apply `alembic upgrade head` to a clean PostgreSQL database and verify downgrade/upgrade behavior.
+1. Execute the reviewed initial migration against a clean PostgreSQL database.
+2. Verify `alembic downgrade base` and `alembic upgrade head`.
+3. Run `alembic revision --autogenerate` after upgrade and confirm there is no unintended schema drift.
+4. Obtain a passing GitHub Actions run for the corrected backend workflow.
+5. Run the backend test suite from a clean environment and record exact output.
 6. Add Docker health checks and a fail-fast deployment script.
 7. Review Telegram authentication, authorization, payment callbacks, and secret handling.
 8. Deploy to the target VPS only after CI and migration evidence are green.
@@ -59,7 +60,8 @@ The project is **not yet a verified beta release**. The backend CI workflow and 
 ## Known Issues and Risks
 
 - No passing current-head CI run has been recorded yet.
-- No executable initial migration revision has been reviewed or tested.
+- The initial migration revision has not been executed on PostgreSQL.
+- Several relational-looking columns are plain integers without Foreign Key constraints because the current models do not declare those constraints.
 - The deployment system has been written but not executed on the target infrastructure.
 - Certbot renewal may renew certificates without automatically reloading Nginx unless reload behavior is explicitly implemented and tested.
 - Some API/service flows may combine in-memory and database-backed behavior; this requires reconciliation.
@@ -78,6 +80,7 @@ The project is **not yet a verified beta release**. The backend CI workflow and 
 - Observability documentation exists, but operational metrics and alerting are not verified.
 - Test isolation is currently service-level and does not yet cover real PostgreSQL transactions.
 - The Alembic model import list must remain synchronized with `backend/app/models`.
+- Foreign Key coverage is incomplete across orders, payments, ticket types, order items, discounts, and check-ins.
 
 ## Environment Status
 
@@ -101,4 +104,4 @@ Do not place passwords, bot tokens, private keys, payment secrets, or production
 
 ## Next Recommended Action
 
-Generate the first Alembic revision from the current model metadata in a disposable environment, review every table/constraint/index operation, and run `alembic upgrade head` against clean PostgreSQL. In parallel, observe the corrected `Backend Tests` workflow and record its exact result before upgrading any capability to `TESTED`.
+Run the reviewed initial migration in a disposable PostgreSQL environment, verify upgrade/downgrade/re-upgrade behavior, run a no-drift autogenerate comparison, and record exact evidence. In parallel, observe the corrected `Backend Tests` workflow and record its result before upgrading any capability to `TESTED`.
