@@ -14,17 +14,23 @@ The project uses semantic versioning where practical. Pre-release status does no
 - Architecture overview
 - AI Context, Bootstrap Guide, Master Prompt, and Handoff
 - Project `VERSION` file
+- Backend development test requirements in `backend/requirements-dev.txt`
+- Meaningful service-level tests for idempotent ticket issuance, single-use check-in, and unknown-ticket rejection
 
 ### Changed
 
 - README now distinguishes implemented, tested, deployed, and verified work.
 - Repository documentation now treats GitHub as the project memory and single source of truth.
+- Backend GitHub Actions workflow now runs from the correct `backend/` directory.
+- CI now installs explicit test dependencies, compiles the backend, and runs tests with the correct `PYTHONPATH`.
+- Placeholder check-in coverage was replaced with real assertions.
 
 ### Known limitations
 
-- Current-head CI and tests are not yet verified.
+- A passing current-head CI result is not yet recorded.
 - Complete Alembic migration path is not yet verified.
 - Telegram, payment provider, VPS, DNS, TLS, backup restore, rollback, and UAT are not verified in target environments.
+- Service-level tests do not yet verify real PostgreSQL transactions or concurrent check-in behavior.
 
 ## Historical Work Before Documentation Baseline
 
