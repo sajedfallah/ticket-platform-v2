@@ -4,59 +4,36 @@ All notable changes to Ticket Platform v2 are recorded here.
 
 The project uses semantic versioning where practical. Pre-release status does not imply production readiness.
 
-## [0.2.0-prebeta] - 2026-07-30
+## [0.2.0-prebeta] - 2026-07-31
 
 ### Added
 
-- Canonical documentation index
-- Truthful Current Project State
-- Evidence-based roadmap
-- Architecture overview
-- AI Context, Bootstrap Guide, Master Prompt, and Handoff
-- Project `VERSION` file
-- Backend development test requirements in `backend/requirements-dev.txt`
-- Meaningful service-level tests for idempotent ticket issuance, single-use check-in, and unknown-ticket rejection
-- Executable Alembic online/offline migration environment driven by `DATABASE_URL`
-- Reviewed initial migration revision in `backend/migrations/versions/20260730_0001_initial_schema.py`
-- PostgreSQL 16 service in GitHub Actions for clean migration lifecycle verification
-- CI steps for Alembic upgrade, current-head inspection, schema-drift check, downgrade to base, re-upgrade, and backend tests
-- Manual `workflow_dispatch` support for backend verification
-- Reusable `backend/scripts/verify_backend.sh` verification entry point
-- Markdown verification report with first-failure capture
-- GitHub Actions Summary publishing and 30-day verification artifact retention
+- Repository memory, architecture, roadmap, AI bootstrap, master prompt, and handoff documentation
+- Backend development test requirements and PostgreSQL-backed verification workflow
+- Executable Alembic environment and reviewed initial migration
+- Reusable backend verification script with Summary and retained artifact reporting
+- `MVPFlowService` with a seeded published event and process-local event/order state
+- Event list, detail, and create API behavior
+- Validated order creation and lookup with quantity, capacity, amount, and currency calculation
+- Mock payment flow tied to actual order amount and status
+- First complete service-level purchase test covering event → order → payment → ticket → check-in
 
 ### Changed
 
-- README now distinguishes implemented, tested, deployed, and verified work.
-- Repository documentation now treats GitHub as the project memory and single source of truth.
-- Backend GitHub Actions workflow now runs from the correct `backend/` directory.
-- CI now installs explicit test dependencies, compiles backend and migration code, and runs tests with the correct `PYTHONPATH`.
-- Placeholder check-in coverage was replaced with real assertions.
-- Alembic no longer contains a fixed sample credential URL and now requires environment configuration.
-- Alembic logging initialization is skipped safely when the minimal configuration has no logging sections.
-- Migration documentation now defines review, upgrade, downgrade, and evidence requirements.
-- Backend CI was renamed to `Backend Verification` to reflect migration and test coverage.
-- CI now delegates verification to one reusable script rather than duplicating commands in workflow YAML.
+- Events and order endpoints no longer return placeholder responses.
+- Payment creation now requires an existing payable order and derives amount/currency from it.
+- Payment verification now updates the matching order before ticket fulfillment.
+- README and project-state documents distinguish implemented, tested, deployed, and verified work.
+- Alembic uses environment-driven credentials and safely handles minimal logging configuration.
 
 ### Known limitations
 
+- The executable MVP product flow is currently in memory and loses data on backend restart.
+- Process-local state is not safe for multiple workers or production deployment.
 - A passing current-head CI result is not yet recorded.
-- The PostgreSQL migration workflow is implemented but its successful execution has not been verified.
-- Several relational-looking columns remain without Foreign Key constraints because current SQLAlchemy models do not declare them.
-- Telegram, payment provider, VPS, DNS, TLS, backup restore, rollback, and UAT are not verified in target environments.
-- Service-level tests do not yet verify real database-backed API transactions or concurrent check-in behavior.
+- Database-backed API integration, concurrent check-in, Telegram authentication, real payment, VPS, DNS, TLS, backup restore, rollback, and UAT remain unverified.
+- Several relational-looking model columns remain without Foreign Key constraints.
 
 ## Historical Work Before Documentation Baseline
 
-The repository contains earlier foundations for:
-
-- FastAPI backend and API routers
-- SQLAlchemy models and services
-- Orders, payments, ticket fulfillment, and QR check-in
-- Integration-test coverage foundation
-- GitHub Actions backend CI
-- Docker Compose production deployment
-- Nginx routing and Certbot TLS bootstrap
-- VPS and beta UAT runbooks
-
-Historical work is not automatically considered tested, deployed, or verified. Refer to `docs/project/current-state.md` for current evidence levels.
+The repository contains earlier foundations for FastAPI, SQLAlchemy models, order/payment/ticket/check-in services, Telegram components, Docker Compose, Nginx, Certbot, deployment runbooks, and beta UAT planning. Historical work is not automatically considered tested, deployed, or verified. Refer to `docs/project/current-state.md` for current evidence levels.
