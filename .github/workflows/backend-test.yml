@@ -41,6 +41,7 @@ jobs:
     env:
       DATABASE_URL: postgresql://ticket_test:ticket_test_password@localhost:5432/ticket_platform_test
       PYTHONPATH: ${{ github.workspace }}/backend
+      VERIFICATION_REPORT_FILE: verification-report.md
 
     steps:
       - name: Checkout repository
@@ -56,23 +57,23 @@ jobs:
       - name: Install dependencies
         run: python -m pip install -r requirements-dev.txt
 
-      - name: Compile backend
-        run: python -m compileall -q app migrations
+      - name: Run backend verification
+        run: bash scripts/verify_backend.sh
 
-      - name: Upgrade clean database
-        run: python -m alembic upgrade head
+      - name: Publish verification summary
+        if: always()
+        run: |
+          if [ -f verification-report.md ]; then
+            cat verification-report.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            printf '# Backend Verification Report\n\n- ❌ Verification report was not created.\n' >> "$GITHUB_STEP_SUMMARY"
+          fi
 
-      - name: Verify migration head
-        run: python -m alembic current
-
-      - name: Verify schema matches models
-        run: python -m alembic check
-
-      - name: Verify downgrade to base
-        run: python -m alembic downgrade base
-
-      - name: Verify re-upgrade from base
-        run: python -m alembic upgrade head
-
-      - name: Run backend tests
-        run: python -m pytest -q ../tests
+      - name: Upload verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-verification-${{ github.sha }}
+          path: backend/verification-report.md
+          if-no-files-found: warn
+          retention-days: 30
