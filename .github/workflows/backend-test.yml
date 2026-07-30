@@ -1,4 +1,4 @@
-name: Backend Tests
+name: Backend Verification
 
 on:
   push:
@@ -13,14 +13,34 @@ on:
       - 'backend/**'
       - 'tests/**'
       - '.github/workflows/backend-test.yml'
+  workflow_dispatch:
 
 jobs:
-  test:
+  verify:
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: ticket_platform_test
+          POSTGRES_USER: ticket_test
+          POSTGRES_PASSWORD: ticket_test_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ticket_test -d ticket_platform_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
 
     defaults:
       run:
         working-directory: backend
+
+    env:
+      DATABASE_URL: postgresql://ticket_test:ticket_test_password@localhost:5432/ticket_platform_test
+      PYTHONPATH: ${{ github.workspace }}/backend
 
     steps:
       - name: Checkout repository
@@ -37,9 +57,22 @@ jobs:
         run: python -m pip install -r requirements-dev.txt
 
       - name: Compile backend
-        run: python -m compileall -q app
+        run: python -m compileall -q app migrations
 
-      - name: Run tests
-        env:
-          PYTHONPATH: ${{ github.workspace }}/backend
+      - name: Upgrade clean database
+        run: python -m alembic upgrade head
+
+      - name: Verify migration head
+        run: python -m alembic current
+
+      - name: Verify schema matches models
+        run: python -m alembic check
+
+      - name: Verify downgrade to base
+        run: python -m alembic downgrade base
+
+      - name: Verify re-upgrade from base
+        run: python -m alembic upgrade head
+
+      - name: Run backend tests
         run: python -m pytest -q ../tests
