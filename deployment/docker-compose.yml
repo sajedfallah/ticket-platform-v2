@@ -1,0 +1,49 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: ticket-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ticket_platform
+      POSTGRES_USER: ticket_user
+      POSTGRES_PASSWORD: ticket_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: ticket-redis
+    restart: unless-stopped
+
+  backend:
+    build: ../backend
+    container_name: ticket-backend
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      DATABASE_URL: postgresql://ticket_user:ticket_password@postgres:5432/ticket_platform
+      REDIS_URL: redis://redis:6379
+
+  telegram-bot:
+    build: ../telegram-bot
+    container_name: ticket-bot
+    restart: unless-stopped
+    depends_on:
+      - backend
+
+  mini-app:
+    build: ../mini-app
+    container_name: ticket-mini-app
+    restart: unless-stopped
+
+  admin-panel:
+    build: ../admin-panel
+    container_name: ticket-admin-panel
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
