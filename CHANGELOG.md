@@ -18,25 +18,28 @@ The project uses semantic versioning where practical. Pre-release status does no
 - Meaningful service-level tests for idempotent ticket issuance, single-use check-in, and unknown-ticket rejection
 - Executable Alembic online/offline migration environment driven by `DATABASE_URL`
 - Reviewed initial migration revision in `backend/migrations/versions/20260730_0001_initial_schema.py`
+- PostgreSQL 16 service in GitHub Actions for clean migration lifecycle verification
+- CI steps for Alembic upgrade, current-head inspection, schema-drift check, downgrade to base, re-upgrade, and backend tests
+- Manual `workflow_dispatch` support for backend verification
 
 ### Changed
 
 - README now distinguishes implemented, tested, deployed, and verified work.
 - Repository documentation now treats GitHub as the project memory and single source of truth.
 - Backend GitHub Actions workflow now runs from the correct `backend/` directory.
-- CI now installs explicit test dependencies, compiles the backend, and runs tests with the correct `PYTHONPATH`.
+- CI now installs explicit test dependencies, compiles backend and migration code, and runs tests with the correct `PYTHONPATH`.
 - Placeholder check-in coverage was replaced with real assertions.
 - Alembic no longer contains a fixed sample credential URL and now requires environment configuration.
 - Migration documentation now defines review, upgrade, downgrade, and evidence requirements.
+- Backend CI was renamed to `Backend Verification` to reflect migration and test coverage.
 
 ### Known limitations
 
 - A passing current-head CI result is not yet recorded.
-- The initial migration revision has not yet been executed against clean PostgreSQL.
-- Downgrade/re-upgrade and schema-drift checks are not yet verified.
+- The PostgreSQL migration workflow is implemented but its successful execution has not been verified.
 - Several relational-looking columns remain without Foreign Key constraints because the current SQLAlchemy models do not declare them.
 - Telegram, payment provider, VPS, DNS, TLS, backup restore, rollback, and UAT are not verified in target environments.
-- Service-level tests do not yet verify real PostgreSQL transactions or concurrent check-in behavior.
+- Service-level tests do not yet verify real database-backed API transactions or concurrent check-in behavior.
 
 ## Historical Work Before Documentation Baseline
 
