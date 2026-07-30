@@ -12,17 +12,9 @@ Stabilize the repository, preserve truthful project memory, and verify the backe
 - Replaced the Alembic placeholder with executable online/offline migration support driven by `DATABASE_URL`.
 - Removed fixed sample database credentials from `backend/alembic.ini`.
 - Inventoried the complete current model set and added `backend/migrations/versions/20260730_0001_initial_schema.py`.
-- Upgraded `.github/workflows/backend-test.yml` into `Backend Verification` with:
-  - an ephemeral PostgreSQL 16 service;
-  - database health checks;
-  - clean `alembic upgrade head`;
-  - `alembic current`;
-  - `alembic check` for schema drift;
-  - `alembic downgrade base`;
-  - re-upgrade to head;
-  - backend compilation and pytest execution;
-  - manual `workflow_dispatch` support.
-- Updated Current Project State and CHANGELOG with exact evidence levels.
+- Upgraded `.github/workflows/backend-test.yml` into `Backend Verification` with PostgreSQL 16, migration lifecycle checks, backend compilation, pytest, and manual dispatch.
+- Found and fixed an Alembic startup defect: `env.py` invoked `fileConfig` even though the minimal `alembic.ini` has no logging sections. Logging setup is now conditional.
+- Updated Current Project State and CHANGELOG with exact evidence levels and verification limitations.
 
 ## Files Changed or Added
 
@@ -41,17 +33,19 @@ Stabilize the repository, preserve truthful project memory, and verify the backe
 ## Key Findings
 
 - The repository is pre-beta, not a verified beta release.
-- The initial migration now exists and mirrors constraints explicitly declared by current models.
+- The initial migration exists and mirrors constraints explicitly declared by current models.
 - Multiple relational-looking columns are plain integers without Foreign Key constraints. The migration intentionally preserves current model behavior instead of inventing relationships.
-- The GitHub Actions workflow now defines real PostgreSQL migration lifecycle checks, but no successful run or logs have been recorded yet.
+- The GitHub Actions workflow defines real PostgreSQL migration lifecycle checks, but no successful run or logs have been recorded yet.
+- The GitHub connector view used here returned no pull-request-triggered runs for the inspected commits.
+- The local audit runtime could not clone GitHub because DNS resolution for `github.com` was unavailable.
 - Backend, persistence, payment/ticket/check-in, Docker, Nginx, and Certbot foundations exist, but target-environment verification remains incomplete.
 
 ## Verification Performed
 
 - Inspected repository metadata, recent commits, combined commit status, workflow, requirements, application bootstrap, fulfillment service, tests, Alembic configuration, and all current SQLAlchemy models through the GitHub connector.
 - Compared migration definitions with model columns, nullability, unique constraints, the ticket-code index, and the declared ticket-to-order Foreign Key.
-- Confirmed that the latest inspected commit had no returned status checks at inspection time.
-- Corrected evidence-backed CI, test, and Alembic defects.
+- Performed static inspection of Alembic startup behavior and corrected the invalid unconditional logging initialization.
+- Attempted an independent clone-and-run verification, but the runtime could not resolve GitHub.
 
 ## Tests Not Yet Executed or Proven Passing
 
@@ -74,19 +68,20 @@ Stabilize the repository, preserve truthful project memory, and verify the backe
 
 - No passing current-head `Backend Verification` result has been recorded.
 - No workflow job logs have been inspected for the PostgreSQL migration lifecycle.
+- The available connector does not expose the needed push-based run evidence.
+- The local audit runtime cannot currently clone GitHub.
 - No target VPS or domain execution evidence exists.
 - No real Telegram or payment-provider configuration exists.
 - Authentication and authorization require audit.
 
 ## Exact Next Action
 
-1. Observe or manually dispatch the `Backend Verification` workflow for commit `52f8f14c51f0676fdaa8fc09d6394d4100c19d09` or the latest documentation head.
-2. Retrieve the workflow jobs and logs.
-3. If a step fails, identify the first root cause and make the smallest coherent repair.
-4. Re-run verification.
-5. If all migration and pytest steps pass, update `docs/project/current-state.md` to mark the covered migration lifecycle and service behaviors as `TESTED`.
-6. Preserve the run URL or identifiers and exact result in this handoff and the changelog.
-7. Only then continue to Docker health checks and fail-fast deployment.
+1. Manually dispatch `Backend Verification` on the latest `main` head.
+2. Retrieve the first failing job step and its log.
+3. If a step fails, fix only the observed root cause and re-run verification.
+4. If all migration and pytest steps pass, update `docs/project/current-state.md` to mark the covered migration lifecycle and service behaviors as `TESTED`.
+5. Preserve the run URL or identifiers and exact result in this handoff and the changelog.
+6. Only then continue to Docker health checks and fail-fast deployment.
 
 Do not mark migrations or tests `TESTED` without a successful PostgreSQL-backed workflow result. Do not add missing Foreign Keys silently; model and domain changes require an ADR and coordinated model/migration updates.
 
