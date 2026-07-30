@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field
 
 from app.payments.provider import PaymentRequest, PaymentStatus, payment_provider
+from app.services.fulfillment_service import fulfillment_service
 
 router = APIRouter(prefix="/payments", tags=["payments"])
 
@@ -46,10 +47,19 @@ def verify_payment(payload: VerifyPaymentPayload):
             detail=str(exc),
         ) from exc
 
+    ticket = None
+    if result.status is PaymentStatus.PAID:
+        ticket = fulfillment_service.fulfill_paid_order(
+            order_id=result.order_id,
+            payment_id=result.payment_id,
+            transaction_id=result.transaction_id or "",
+        )
+
     return {
         "payment_id": result.payment_id,
         "order_id": result.order_id,
         "status": result.status.value,
         "transaction_id": result.transaction_id,
-        "should_issue_ticket": result.status is PaymentStatus.PAID,
+        "order_status": "paid" if ticket else "pending",
+        "ticket": fulfillment_service.serialize(ticket) if ticket else None,
     }
