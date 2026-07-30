@@ -4,11 +4,27 @@ set -euo pipefail
 : "${DATABASE_URL:?DATABASE_URL must be set to a disposable PostgreSQL database}"
 
 REPORT_FILE="${VERIFICATION_REPORT_FILE:-verification-report.md}"
+CURRENT_STEP="initialization"
+
+record_failure() {
+  local exit_code=$?
+  printf -- '- ❌ %s (exit code %s)\n' "$CURRENT_STEP" "$exit_code" >> "$REPORT_FILE"
+  cat >> "$REPORT_FILE" <<'EOF'
+
+## Evidence Level
+
+Verification stopped at the failed step above. No later step should be treated as executed or passing.
+EOF
+  exit "$exit_code"
+}
+
+trap record_failure ERR
 
 run_step() {
   local title="$1"
   shift
 
+  CURRENT_STEP="$title"
   echo "==> ${title}"
   "$@"
   printf -- '- ✅ %s\n' "$title" >> "$REPORT_FILE"
@@ -31,6 +47,7 @@ run_step "Downgrade database to base" python -m alembic downgrade base
 run_step "Re-upgrade database to Alembic head" python -m alembic upgrade head
 run_step "Run backend test suite" python -m pytest -q ../tests
 
+trap - ERR
 cat >> "$REPORT_FILE" <<'EOF'
 
 ## Evidence Level
