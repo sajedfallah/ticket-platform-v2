@@ -6,14 +6,14 @@
 - **Current version:** `0.2.0-prebeta`
 - **Current phase:** Repository stabilization and pre-beta verification
 - **Current sprint:** CI, migration lifecycle, database verification, and deployment readiness
-- **Last reviewed commit:** `52f8f14c51f0676fdaa8fc09d6394d4100c19d09`
+- **Last reviewed commit:** `f41b83df5b155341d6584691edb97d53139b4e46`
 - **Last updated:** 2026-07-30
 
 ## Executive Status
 
 The repository contains a substantial event-ticketing foundation: FastAPI routes, SQLAlchemy models and services, order/payment/ticket flows, QR check-in protections, Docker production configuration, Nginx routing, Certbot TLS bootstrap, repository governance, backend tests, an executable Alembic environment, an initial migration revision, and a GitHub Actions verification workflow backed by PostgreSQL 16.
 
-The project is **not yet a verified beta release**. The workflow now defines clean-database upgrade, schema-drift checking, downgrade to base, re-upgrade, compilation, and backend tests. However, no successful run result or job log has yet been recorded, so these capabilities remain implemented rather than tested.
+The project is **not yet a verified beta release**. The workflow defines clean-database upgrade, schema-drift checking, downgrade to base, re-upgrade, compilation, and backend tests. A static verification pass also found and fixed an Alembic startup defect: the migration environment attempted to load logging sections that do not exist in the intentionally minimal `alembic.ini`. No successful workflow result or job log has yet been recorded, so migration and test capabilities remain implemented rather than tested.
 
 ## Capability Matrix
 
@@ -28,13 +28,13 @@ The project is **not yet a verified beta release**. The workflow now defines cle
 | Ticket issuance | IMPLEMENTED | Fulfillment and ticket services exist. |
 | QR validation and duplicate check-in protection | IMPLEMENTED | Service and route logic exist; concurrent PostgreSQL behavior is not verified. |
 | Database models/session/transactions | IMPLEMENTED | SQLAlchemy foundations exist. |
-| Alembic runtime environment | IMPLEMENTED | Online/offline execution, model registration, logging, and environment-driven URL handling exist. |
+| Alembic runtime environment | IMPLEMENTED | Online/offline execution, model registration, environment-driven URL handling, and safe optional logging configuration exist. |
 | Initial migration revision | IMPLEMENTED | `20260730_0001_initial_schema.py` mirrors current model declarations. |
 | PostgreSQL migration verification workflow | IMPLEMENTED | CI provisions PostgreSQL 16 and runs upgrade, drift check, downgrade, and re-upgrade. No passing result recorded. |
 | Clean migration lifecycle | BLOCKED | Workflow exists, but successful execution evidence is missing. |
 | Integration tests | IMPLEMENTED | Tests cover idempotent issuance, single-use check-in, and unknown tickets. |
 | Current-head automated tests | BLOCKED | Test code exists, but no passing current-head execution evidence has been recorded. |
-| GitHub Actions backend verification | IMPLEMENTED | Workflow now includes PostgreSQL migration lifecycle and backend tests; result unverified. |
+| GitHub Actions backend verification | IMPLEMENTED | Workflow includes PostgreSQL migration lifecycle and backend tests; result unverified. |
 | Telegram bot | IMPLEMENTED | Container/service foundation exists; real token and behavior not verified. |
 | Telegram Mini App | IMPLEMENTED | Build/service foundation exists; product flow and production rendering not verified. |
 | Admin panel | IMPLEMENTED | Build/service foundation exists; authorization and production rendering not verified. |
@@ -61,6 +61,8 @@ The project is **not yet a verified beta release**. The workflow now defines cle
 
 - No passing current-head CI run has been recorded yet.
 - The PostgreSQL verification workflow is implemented but has not produced recorded evidence.
+- The current connector view only returned pull-request-triggered runs and did not expose a push-based run for the inspected commits.
+- The local execution environment used during this audit could not resolve `github.com`, so an independent clone-and-run verification could not be completed.
 - Several relational-looking columns are plain integers without Foreign Key constraints because the current models do not declare those constraints.
 - The deployment system has been written but not executed on the target infrastructure.
 - Certbot renewal may renew certificates without automatically reloading Nginx unless reload behavior is explicitly implemented and tested.
@@ -89,6 +91,7 @@ The project is **not yet a verified beta release**. The workflow now defines cle
 | Developer workstation | UNKNOWN |
 | GitHub Actions | POSTGRESQL VERIFICATION WORKFLOW IMPLEMENTED; RESULT UNVERIFIED |
 | Ephemeral PostgreSQL 16 CI service | CONFIGURED; EXECUTION UNVERIFIED |
+| Audit execution environment | NETWORK BLOCKED FOR GITHUB CLONE |
 | Beta VPS | NOT DEPLOYED |
 | Production | NOT DEPLOYED |
 
@@ -104,4 +107,4 @@ Do not place passwords, bot tokens, private keys, payment secrets, or production
 
 ## Next Recommended Action
 
-Observe the `Backend Verification` workflow created by commit `52f8f14c51f0676fdaa8fc09d6394d4100c19d09`. Retrieve its job result and logs. If it fails, repair only the observed root cause. If all migration and test steps pass, mark the covered migration lifecycle and backend service behaviors as `TESTED` and preserve the run URL or identifiers as evidence.
+Manually dispatch `Backend Verification` on the latest `main` head and inspect its first failing step. The current migration environment now avoids crashing on absent logging sections in `alembic.ini`. If all migration and pytest steps pass, mark the covered migration lifecycle and backend service behaviors as `TESTED` and preserve the run URL or identifiers as evidence.
