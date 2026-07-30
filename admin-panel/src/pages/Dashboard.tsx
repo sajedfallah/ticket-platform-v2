@@ -1,12 +1,14 @@
+import StatsGrid from '../components/StatsGrid';
+import RevenueChart from '../components/RevenueChart';
+import RecentOrders from '../components/RecentOrders';
+
 export default function Dashboard() {
   return (
-    <main>
+    <main className="dashboard">
       <h1>Organizer Dashboard</h1>
-      <section>
-        <p>Total Events: 0</p>
-        <p>Total Tickets Sold: 0</p>
-        <p>Revenue: 0</p>
-      </section>
+      <StatsGrid />
+      <RevenueChart />
+      <RecentOrders />
     </main>
   );
 }
