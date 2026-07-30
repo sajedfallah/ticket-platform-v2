@@ -1,0 +1,10 @@
+export const ROLES = {
+  SUPER_ADMIN: 'SUPER_ADMIN',
+  ORGANIZER: 'ORGANIZER',
+  SCANNER_STAFF: 'SCANNER_STAFF',
+};
+
+export type AdminRole =
+  | 'SUPER_ADMIN'
+  | 'ORGANIZER'
+  | 'SCANNER_STAFF';
