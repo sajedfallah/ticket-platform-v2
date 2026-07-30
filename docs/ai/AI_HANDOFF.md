@@ -2,60 +2,54 @@
 
 ## Objective
 
-Stabilize the repository, establish truthful project memory, and verify the backend before any new feature or VPS deployment work.
+Stabilize the repository, establish truthful project memory, and verify the backend and database lifecycle before any new feature or VPS deployment work.
 
 ## Work Completed
 
-- Replaced the outdated README with a repository-first and evidence-based entry point.
-- Added canonical documentation, current-state, roadmap, architecture, AI context, bootstrap, master prompt, and handoff files.
-- Audited the backend CI workflow and found that it ran from the repository root while dependencies live under `backend/`.
-- Added `backend/requirements-dev.txt` with explicit test dependencies.
-- Corrected `.github/workflows/backend-test.yml` to use the backend working directory, correct dependency paths, backend compilation, and explicit `PYTHONPATH`.
-- Replaced a placeholder `assert True` integration gate with real assertions for:
-  - idempotent ticket issuance;
-  - single-use ticket check-in;
-  - rejection of unknown ticket codes.
-- Updated Current Project State and CHANGELOG with the new evidence and remaining limitations.
+- Established repository-first documentation, Current Project State, architecture, roadmap, AI context, bootstrap, master prompt, and handoff files.
+- Audited and repaired the backend GitHub Actions workflow paths and test dependencies.
+- Replaced placeholder check-in coverage with real assertions for idempotent issuance, single-use check-in, and unknown-ticket rejection.
+- Checked the latest commit status and found no registered CI statuses available through the connector.
+- Audited Alembic and found that `backend/migrations/env.py` was a non-executable placeholder and `backend/alembic.ini` contained a fixed sample credential URL.
+- Replaced the Alembic placeholder with online/offline migration execution, environment-driven `DATABASE_URL`, logging support, schema comparison options, and explicit imports for all known model modules.
+- Removed fixed database credentials from `alembic.ini`.
+- Expanded the migration runbook with safe generation, review, upgrade, downgrade, and evidence requirements.
 
 ## Files Changed or Added
 
-- `README.md`
-- `VERSION`
-- `CHANGELOG.md`
 - `.github/workflows/backend-test.yml`
 - `backend/requirements-dev.txt`
 - `tests/integration/test_payment_ticket_checkin_flow.py`
-- `docs/index.md`
+- `backend/alembic.ini`
+- `backend/migrations/env.py`
+- `backend/migrations/README.md`
 - `docs/project/current-state.md`
-- `docs/project/roadmap.md`
-- `docs/architecture/overview.md`
-- `docs/development/documentation-rules.md`
-- `docs/development/definition-of-done.md`
-- `docs/adr/README.md`
-- `docs/ai/AI_CONTEXT.md`
-- `docs/ai/AI_BOOTSTRAP.md`
-- `docs/ai/AI_MASTER_PROMPT.md`
+- `CHANGELOG.md`
 - `docs/ai/AI_HANDOFF.md`
+- Repository governance and architecture documents listed in `docs/index.md`
 
 ## Key Findings
 
 - The repository is pre-beta, not a verified beta release.
-- The original CI workflow referenced `requirements.txt` and `pytest` from the repository root, but the dependency file is inside `backend/` and `pytest` was not declared.
-- The existing check-in test contained a placeholder assertion and did not validate behavior.
-- Backend, persistence, payment/ticket/check-in, Docker, Nginx, and Certbot foundations exist.
-- Current-head passing CI, complete migrations, real payment, Telegram production configuration, VPS deployment, backup restore, rollback, and UAT remain unverified.
+- No current-head GitHub status checks were returned for the latest inspected commit.
+- The original CI workflow used incorrect root-level paths and omitted an explicit pytest dependency.
+- The previous Alembic environment could not run migrations because it lacked Alembic context configuration and execution functions.
+- No reviewed initial migration revision chain is currently proven.
+- Backend, persistence, payment/ticket/check-in, Docker, Nginx, and Certbot foundations exist, but target-environment verification remains incomplete.
 
 ## Verification Performed
 
-- Inspected repository metadata, commit history, backend workflow, backend requirements, application bootstrap, fulfillment service, and integration tests through the GitHub connector.
-- Confirmed no pull-request-triggered workflow run was returned for the inspected commits.
-- Corrected evidence-backed CI and test defects.
+- Inspected repository metadata, recent commits, combined commit status, CI workflow, requirements, application bootstrap, fulfillment service, tests, Alembic configuration, migration environment, and model-history evidence through the GitHub connector.
+- Confirmed no status checks were registered for the latest inspected commit.
+- Corrected evidence-backed CI, test, and Alembic defects.
 
 ## Tests Not Yet Executed or Proven Passing
 
 - Corrected GitHub Actions backend workflow on current head
 - Local clean-environment backend test run
-- Clean-database Alembic migration
+- Initial Alembic revision generation and manual review
+- Clean PostgreSQL `alembic upgrade head`
+- Alembic downgrade/upgrade verification
 - Database-backed API integration tests
 - Concurrent check-in protection
 - Docker Compose build and health checks
@@ -69,14 +63,25 @@ Stabilize the repository, establish truthful project memory, and verify the back
 ## Current Blockers
 
 - No passing current-head CI result has been recorded.
-- No complete executable migration-chain evidence.
-- No target VPS or domain execution evidence.
-- No real Telegram or payment-provider configuration.
+- No reviewed initial Alembic revision exists.
+- No clean PostgreSQL migration evidence exists.
+- No target VPS or domain execution evidence exists.
+- No real Telegram or payment-provider configuration exists.
 - Authentication and authorization require audit.
 
 ## Exact Next Action
 
-Observe or trigger the corrected `Backend Tests` workflow on `main`. Retrieve its jobs and logs. If it fails, fix only the observed root cause. If it passes, update `docs/project/current-state.md` to mark the covered backend service behavior as `TESTED`, then proceed to clean-database migration verification.
+From a disposable environment with PostgreSQL available:
+
+1. Run from `backend/` with a non-production `DATABASE_URL`.
+2. Execute `alembic revision --autogenerate -m "initial schema"`.
+3. Review every generated table, column, index, unique constraint, and foreign key against the current SQLAlchemy models.
+4. Apply `alembic upgrade head` to an empty database.
+5. Run the backend tests.
+6. Record exact command output and commit the reviewed revision only if successful.
+7. Update `docs/project/current-state.md`, `CHANGELOG.md`, and this handoff with the evidence.
+
+Do not fabricate a migration revision without comparing it to the complete current model set.
 
 ## Required Human Inputs for Later Deployment
 
