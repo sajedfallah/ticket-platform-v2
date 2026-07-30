@@ -25,7 +25,9 @@ from app.models import (  # noqa: F401
 
 config = context.config
 
-if config.config_file_name is not None:
+# Only configure logging when the expected Alembic logging sections exist.
+# The project intentionally keeps alembic.ini minimal and credential-free.
+if config.config_file_name is not None and config.file_config.has_section("loggers"):
     fileConfig(config.config_file_name, disable_existing_loggers=False)
 
 
