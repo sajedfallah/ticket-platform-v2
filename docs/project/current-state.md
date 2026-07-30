@@ -6,14 +6,14 @@
 - **Current version:** `0.2.0-prebeta`
 - **Current phase:** Repository stabilization and pre-beta verification
 - **Current sprint:** CI, migration lifecycle, database verification, and deployment readiness
-- **Last reviewed commit:** `f41b83df5b155341d6584691edb97d53139b4e46`
+- **Last reviewed commit:** `c1e32e7bd240000f3f498ae135e4dbdd46364e53`
 - **Last updated:** 2026-07-30
 
 ## Executive Status
 
-The repository contains a substantial event-ticketing foundation: FastAPI routes, SQLAlchemy models and services, order/payment/ticket flows, QR check-in protections, Docker production configuration, Nginx routing, Certbot TLS bootstrap, repository governance, backend tests, an executable Alembic environment, an initial migration revision, and a GitHub Actions verification workflow backed by PostgreSQL 16.
+The repository contains a substantial event-ticketing foundation: FastAPI routes, SQLAlchemy models and services, order/payment/ticket flows, QR check-in protections, Docker production configuration, Nginx routing, Certbot TLS bootstrap, repository governance, backend tests, an executable Alembic environment, an initial migration revision, and a PostgreSQL-backed GitHub Actions verification workflow.
 
-The project is **not yet a verified beta release**. The workflow defines clean-database upgrade, schema-drift checking, downgrade to base, re-upgrade, compilation, and backend tests. A static verification pass also found and fixed an Alembic startup defect: the migration environment attempted to load logging sections that do not exist in the intentionally minimal `alembic.ini`. No successful workflow result or job log has yet been recorded, so migration and test capabilities remain implemented rather than tested.
+The project is **not yet a verified beta release**. Verification is now centralized in `backend/scripts/verify_backend.sh`, which records each successful step and the first failed step in a Markdown report. GitHub Actions publishes that report to the run summary and retains it as an artifact. No successful workflow result has yet been recorded, so migration and test capabilities remain implemented rather than tested.
 
 ## Capability Matrix
 
@@ -30,11 +30,12 @@ The project is **not yet a verified beta release**. The workflow defines clean-d
 | Database models/session/transactions | IMPLEMENTED | SQLAlchemy foundations exist. |
 | Alembic runtime environment | IMPLEMENTED | Online/offline execution, model registration, environment-driven URL handling, and safe optional logging configuration exist. |
 | Initial migration revision | IMPLEMENTED | `20260730_0001_initial_schema.py` mirrors current model declarations. |
-| PostgreSQL migration verification workflow | IMPLEMENTED | CI provisions PostgreSQL 16 and runs upgrade, drift check, downgrade, and re-upgrade. No passing result recorded. |
+| PostgreSQL migration verification workflow | IMPLEMENTED | CI provisions PostgreSQL 16 and invokes the reusable verification script. No passing result recorded. |
+| Verification report and artifact | IMPLEMENTED | Each run produces a step summary and retained Markdown artifact, including the first failed step. |
 | Clean migration lifecycle | BLOCKED | Workflow exists, but successful execution evidence is missing. |
 | Integration tests | IMPLEMENTED | Tests cover idempotent issuance, single-use check-in, and unknown tickets. |
 | Current-head automated tests | BLOCKED | Test code exists, but no passing current-head execution evidence has been recorded. |
-| GitHub Actions backend verification | IMPLEMENTED | Workflow includes PostgreSQL migration lifecycle and backend tests; result unverified. |
+| GitHub Actions backend verification | IMPLEMENTED | Workflow includes PostgreSQL migration lifecycle, schema drift check, and backend tests; result unverified. |
 | Telegram bot | IMPLEMENTED | Container/service foundation exists; real token and behavior not verified. |
 | Telegram Mini App | IMPLEMENTED | Build/service foundation exists; product flow and production rendering not verified. |
 | Admin panel | IMPLEMENTED | Build/service foundation exists; authorization and production rendering not verified. |
@@ -48,23 +49,24 @@ The project is **not yet a verified beta release**. The workflow defines clean-d
 
 ## Current Priorities
 
-1. Obtain and inspect a successful or failing run of `Backend Verification` on the current head.
-2. Fix only evidence-backed workflow, migration, or test failures.
-3. Record exact PostgreSQL upgrade, downgrade, re-upgrade, drift-check, and pytest output.
-4. Add Docker health checks and a fail-fast deployment script after CI is green.
-5. Reconcile in-memory and database-backed order/payment/ticket flows.
-6. Review Telegram authentication, authorization, payment callbacks, and secret handling.
-7. Deploy to the target VPS only after CI and migration evidence are green.
-8. Execute and record limited beta UAT.
+1. Run `Backend Verification` on the current `main` head.
+2. Inspect the generated Summary and `backend-verification-<sha>` artifact.
+3. Fix only the first evidence-backed failing step.
+4. Record exact PostgreSQL upgrade, drift-check, downgrade, re-upgrade, and pytest evidence.
+5. Add Docker health checks and a fail-fast deployment script after CI is green.
+6. Reconcile in-memory and database-backed order/payment/ticket flows.
+7. Review Telegram authentication, authorization, payment callbacks, and secret handling.
+8. Deploy to the target VPS only after CI and migration evidence are green.
+9. Execute and record limited beta UAT.
 
 ## Known Issues and Risks
 
 - No passing current-head CI run has been recorded yet.
-- The PostgreSQL verification workflow is implemented but has not produced recorded evidence.
-- The current connector view only returned pull-request-triggered runs and did not expose a push-based run for the inspected commits.
-- The local execution environment used during this audit could not resolve `github.com`, so an independent clone-and-run verification could not be completed.
-- Several relational-looking columns are plain integers without Foreign Key constraints because the current models do not declare those constraints.
-- The deployment system has been written but not executed on the target infrastructure.
+- The PostgreSQL verification workflow is implemented but has not produced recorded success evidence.
+- The connector view available during this audit did not expose push-based workflow runs.
+- The audit execution environment could not resolve `github.com`, so an independent clone-and-run verification could not be completed.
+- Several relational-looking columns are plain integers without Foreign Key constraints because current models do not declare those constraints.
+- The deployment system has been written but not executed on target infrastructure.
 - Certbot renewal may renew certificates without automatically reloading Nginx unless reload behavior is explicitly implemented and tested.
 - Some API/service flows may combine in-memory and database-backed behavior; this requires reconciliation.
 - Authentication and authorization coverage has not been proven.
@@ -89,7 +91,7 @@ The project is **not yet a verified beta release**. The workflow defines clean-d
 | Environment | Status |
 |---|---|
 | Developer workstation | UNKNOWN |
-| GitHub Actions | POSTGRESQL VERIFICATION WORKFLOW IMPLEMENTED; RESULT UNVERIFIED |
+| GitHub Actions | POSTGRESQL VERIFICATION + REPORTING IMPLEMENTED; RESULT UNVERIFIED |
 | Ephemeral PostgreSQL 16 CI service | CONFIGURED; EXECUTION UNVERIFIED |
 | Audit execution environment | NETWORK BLOCKED FOR GITHUB CLONE |
 | Beta VPS | NOT DEPLOYED |
@@ -107,4 +109,4 @@ Do not place passwords, bot tokens, private keys, payment secrets, or production
 
 ## Next Recommended Action
 
-Manually dispatch `Backend Verification` on the latest `main` head and inspect its first failing step. The current migration environment now avoids crashing on absent logging sections in `alembic.ini`. If all migration and pytest steps pass, mark the covered migration lifecycle and backend service behaviors as `TESTED` and preserve the run URL or identifiers as evidence.
+Manually dispatch `Backend Verification` on the latest `main` head. Open the run Summary or download the `backend-verification-<sha>` artifact, then repair only the first failed step. If every recorded step passes, mark the covered migration lifecycle and backend service behaviors as `TESTED` and preserve the run URL and commit SHA as evidence.
