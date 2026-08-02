@@ -1,48 +1,808 @@
+/* =========================================
+   TIKINO MINI APP — FINAL STYLES
+========================================= */
+
 :root {
   font-family: Vazirmatn, Tahoma, Arial, sans-serif;
-  color: #f7f1e3;
-  background: #07111f;
+  color: #ffffff;
+  background: #071321;
   font-synthesis: none;
+  text-rendering: optimizeLegibility;
 }
 
-* { box-sizing: border-box; }
-body { margin: 0; min-width: 320px; background: radial-gradient(circle at top, #17324f 0%, #07111f 52%); }
-button, select { font: inherit; }
-button { cursor: pointer; }
+* {
+  box-sizing: border-box;
+}
 
-.shell { width: min(100%, 560px); margin: 0 auto; min-height: 100vh; padding: 24px 18px 40px; }
-.hero { padding: 18px 4px 24px; }
-.hero h1 { margin: 6px 0 8px; font-size: 2rem; }
-.hero p { margin: 0; color: #c6d0dc; line-height: 1.8; }
-.eyebrow { color: #d8b75f !important; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+html,
+body,
+#root {
+  width: 100%;
+  min-width: 320px;
+  min-height: 100%;
+  margin: 0;
+}
 
-.event-list { display: grid; gap: 14px; }
-.event-card { width: 100%; text-align: right; border: 1px solid rgba(216,183,95,.24); border-radius: 20px; padding: 18px; background: rgba(16,31,48,.86); color: inherit; box-shadow: 0 18px 50px rgba(0,0,0,.22); transition: .2s ease; }
-.event-card.selected { border-color: #d8b75f; transform: translateY(-2px); }
-.event-card h2 { margin: 10px 0 8px; font-size: 1.2rem; }
-.event-card p { color: #bcc8d5; line-height: 1.7; }
-.event-card strong { color: #f1d889; font-size: 1.1rem; }
-.badge { display: inline-flex; padding: 6px 10px; border-radius: 999px; background: rgba(216,183,95,.14); color: #f1d889; font-size: .78rem; font-weight: 700; }
+body {
+  direction: rtl;
+  overflow-x: hidden;
 
-.checkout, .ticket-card { margin-top: 18px; border-radius: 22px; padding: 20px; background: #f8f1df; color: #0d1b2a; box-shadow: 0 20px 60px rgba(0,0,0,.3); }
-.checkout > div, .checkout label { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 11px 0; }
-.checkout span, .checkout label { color: #56616d; }
-.checkout select { border: 1px solid #ccd2d8; border-radius: 10px; padding: 8px 12px; background: white; }
-.total { border-top: 1px solid #ded8c7; margin-top: 8px; }
-.total strong { color: #8b6511; font-size: 1.2rem; }
-.primary, .secondary { width: 100%; border: 0; border-radius: 14px; padding: 14px 18px; font-weight: 800; }
-.primary { margin-top: 12px; color: #07111f; background: linear-gradient(135deg, #f0d37d, #c99c2e); }
-.primary:disabled { opacity: .6; cursor: wait; }
-.secondary { margin-top: 18px; color: #f7f1e3; background: #0d1b2a; }
+  background:
+    radial-gradient(
+      circle at 50% -10%,
+      #24496e 0%,
+      #102942 31%,
+      #081725 67%,
+      #05101c 100%
+    );
 
-.error { margin-bottom: 14px; border: 1px solid #ef7f7f; border-radius: 14px; padding: 12px 14px; color: #ffd8d8; background: rgba(115,22,22,.45); }
-.state { text-align: center; margin-top: 40vh; color: #c6d0dc; }
-.ticket-card { text-align: center; }
-.ticket-card h1 { margin: 14px 0 6px; }
-.ticket-card p { color: #69737d; }
-.qr-wrap { width: fit-content; margin: 22px auto; padding: 16px; border-radius: 18px; background: white; }
-.ticket-card code { display: block; direction: ltr; overflow-wrap: anywhere; font-size: .82rem; color: #4b5661; }
-dl { margin: 22px 0 0; }
-dl div { display: flex; justify-content: space-between; gap: 14px; padding: 10px 0; border-bottom: 1px solid #e6decb; }
-dt { color: #69737d; }
-dd { margin: 0; font-weight: 800; }
+  color: #ffffff;
+}
+
+button,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:focus-visible,
+select:focus-visible {
+  outline: 3px solid rgba(242, 198, 79, 0.45);
+  outline-offset: 3px;
+}
+
+/* =========================================
+   MAIN LAYOUT
+========================================= */
+
+.shell {
+  width: min(100%, 600px);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 32px 20px 52px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.state {
+  margin: auto;
+  color: #dce6f2;
+  font-size: 17px;
+  text-align: center;
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+.tikino-header {
+  width: 100%;
+  max-width: 540px;
+  margin: 0 auto 34px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  text-align: center;
+}
+
+.header-logo {
+  display: block;
+
+  width: 165px;
+  max-width: 58vw;
+  height: auto;
+  max-height: 86px;
+
+  margin: 0 auto 24px;
+
+  object-fit: contain;
+
+  filter: drop-shadow(0 8px 22px rgba(116, 62, 255, 0.24));
+}
+
+.tikino-header h1 {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: clamp(27px, 5vw, 36px);
+  font-weight: 900;
+  line-height: 1.45;
+}
+
+/* پشتیبانی از ساختار قدیمی Header */
+
+.hero {
+  width: 100%;
+  max-width: 540px;
+  margin: 0 auto 34px;
+
+  text-align: center;
+}
+
+.main-logo {
+  display: block;
+
+  width: 165px;
+  max-width: 58vw;
+  height: auto;
+  max-height: 86px;
+
+  margin: 0 auto 24px;
+
+  object-fit: contain;
+}
+
+.hero h1 {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: clamp(27px, 5vw, 36px);
+  font-weight: 900;
+}
+
+/* =========================================
+   ERROR
+========================================= */
+
+.error {
+  width: 100%;
+  max-width: 540px;
+
+  margin: 0 0 20px;
+  padding: 14px 16px;
+
+  border: 1px solid rgba(255, 120, 120, 0.65);
+  border-radius: 14px;
+
+  background: rgba(108, 20, 28, 0.68);
+  color: #ffe4e4;
+
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+/* =========================================
+   EVENT LIST
+========================================= */
+
+.event-list {
+  width: 100%;
+  max-width: 540px;
+
+  display: grid;
+  gap: 18px;
+}
+
+.event-card {
+  width: 100%;
+
+  padding: 27px 26px;
+
+  border: 1px solid rgba(216, 183, 95, 0.4);
+  border-radius: 27px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(23, 50, 78, 0.98),
+      rgba(9, 26, 43, 0.98)
+    );
+
+  color: #ffffff;
+  text-align: right;
+
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035);
+
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.event-card:hover {
+  transform: translateY(-2px);
+}
+
+.event-card.selected {
+  border-color: #e0b83f;
+
+  box-shadow:
+    0 20px 56px rgba(0, 0, 0, 0.27),
+    0 0 0 1px rgba(224, 184, 63, 0.15);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 7px 13px;
+
+  border: 1px solid rgba(242, 198, 79, 0.16);
+  border-radius: 999px;
+
+  background: rgba(242, 198, 79, 0.09);
+  color: #f2c64f;
+
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.event-card h2 {
+  margin: 20px 0 11px;
+
+  color: #ffffff;
+
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1.55;
+}
+
+.event-card p {
+  margin: 0;
+
+  color: #c5d2df;
+
+  font-size: 15px;
+  line-height: 1.95;
+}
+
+.event-card strong {
+  display: block;
+
+  margin-top: 20px;
+
+  direction: ltr;
+
+  color: #f2c64f;
+
+  font-size: 22px;
+  font-weight: 900;
+  text-align: right;
+}
+
+/* =========================================
+   CHECKOUT
+========================================= */
+
+.checkout {
+  width: 100%;
+  max-width: 540px;
+
+  margin-top: 20px;
+  padding: 26px;
+
+  border: 1px solid rgba(211, 192, 147, 0.7);
+  border-radius: 28px;
+
+  background:
+    linear-gradient(
+      150deg,
+      #fbf7eb 0%,
+      #f3ead5 100%
+    );
+
+  color: #10243b;
+
+  box-shadow:
+    0 22px 58px rgba(0, 0, 0, 0.28);
+}
+
+.checkout > div,
+.checkout > label {
+  min-height: 58px;
+  padding: 14px 0;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+
+  border-bottom: 1px solid rgba(67, 77, 84, 0.15);
+}
+
+.checkout span,
+.checkout label {
+  color: #5f6972;
+  font-weight: 700;
+}
+
+.checkout strong {
+  color: #10243b;
+  font-weight: 900;
+  text-align: left;
+}
+
+.checkout select {
+  min-width: 66px;
+  height: 40px;
+  padding: 4px 10px;
+
+  border: 1px solid #c7c8c3;
+  border-radius: 11px;
+
+  background: #ffffff;
+  color: #10243b;
+
+  font-weight: 800;
+  text-align: center;
+}
+
+.checkout .total {
+  margin-top: 4px;
+  border-bottom: 0;
+}
+
+.checkout .total strong {
+  direction: ltr;
+
+  color: #987000;
+
+  font-size: 22px;
+}
+
+.primary {
+  width: 100%;
+
+  margin-top: 18px;
+  padding: 17px 20px;
+
+  border: 0;
+  border-radius: 17px;
+
+  background:
+    linear-gradient(
+      100deg,
+      #f4d671 0%,
+      #d1a52d 100%
+    );
+
+  color: #10243b;
+
+  font-size: 18px;
+  font-weight: 900;
+
+  box-shadow:
+    0 12px 26px rgba(157, 113, 9, 0.22);
+
+  transition:
+    transform 0.18s ease,
+    filter 0.18s ease;
+}
+
+.primary:hover:not(:disabled) {
+  filter: brightness(1.04);
+}
+
+.primary:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.primary:disabled {
+  cursor: wait;
+  opacity: 0.62;
+}
+
+/* =========================================
+   PREMIUM TICKET PAGE
+========================================= */
+
+.ticket-page {
+  justify-content: flex-start;
+  padding-top: 28px;
+  padding-bottom: 40px;
+}
+
+.ticket-card {
+  width: min(430px, 100%);
+
+  padding: 35px 28px 30px;
+
+  border: 1px solid rgba(137, 169, 207, 0.32);
+  border-radius: 34px;
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(37, 72, 108, 0.72),
+      transparent 40%
+    ),
+    linear-gradient(
+      160deg,
+      #142e4a 0%,
+      #0c2137 48%,
+      #071725 100%
+    );
+
+  color: #ffffff;
+  text-align: center;
+
+  box-shadow:
+    0 28px 75px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.045);
+}
+
+.ticket-logo {
+  display: block;
+
+  width: 165px;
+  max-width: 62%;
+  height: auto;
+  max-height: 84px;
+
+  margin: 0 auto 30px;
+
+  object-fit: contain;
+
+  filter:
+    drop-shadow(0 7px 18px rgba(116, 62, 255, 0.32))
+    drop-shadow(0 1px 1px rgba(255, 255, 255, 0.13));
+}
+
+.event-pass {
+  margin: 0 0 25px;
+
+  color: #f2c64f;
+
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 7px;
+  line-height: 1.4;
+}
+
+.ticket-title,
+.ticket-card h1 {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 28px;
+  font-weight: 900;
+  line-height: 1.5;
+}
+
+.ticket-type,
+.ticket-card > p {
+  margin: 12px 0 0;
+
+  color: #d8e3ee;
+
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+.ticket-divider {
+  width: 100%;
+  height: 1px;
+
+  margin: 26px 0;
+
+  background:
+    repeating-linear-gradient(
+      90deg,
+      #d5aa32 0,
+      #d5aa32 7px,
+      transparent 7px,
+      transparent 12px
+    );
+
+  opacity: 0.88;
+}
+
+/* =========================================
+   QR CODE
+========================================= */
+
+.qr-wrap {
+  width: max-content;
+
+  margin: 0 auto 18px;
+  padding: 10px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 23px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 14px 32px rgba(0, 0, 0, 0.27);
+}
+
+.qr-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  line-height: 0;
+}
+
+.qr-wrapper canvas,
+.qr-wrapper svg {
+  display: block;
+
+  width: 220px !important;
+  height: 220px !important;
+
+  max-width: 62vw;
+  max-height: 62vw;
+}
+
+/* =========================================
+   TICKET CODE
+========================================= */
+
+.ticket-code-label {
+  margin: 3px 0 9px;
+
+  color: #f2c64f;
+
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.ticket-code {
+  width: 100%;
+  min-height: 56px;
+
+  padding: 12px 15px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  direction: ltr;
+  overflow-wrap: anywhere;
+
+  border: 1px dashed #d5aa32;
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.035);
+  color: #ffffff;
+
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* =========================================
+   TICKET DETAILS
+========================================= */
+
+.ticket-details,
+.ticket-card dl {
+  margin: 0;
+}
+
+.ticket-details > div,
+.ticket-card dl > div {
+  min-height: 57px;
+  padding: 15px 0;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.13);
+}
+
+.ticket-details dt,
+.ticket-card dt {
+  color: #dce6f0;
+
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.ticket-details dd,
+.ticket-card dd {
+  margin: 0;
+
+  direction: ltr;
+  overflow-wrap: anywhere;
+
+  color: #ffffff;
+
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.secondary {
+  width: 100%;
+
+  margin-top: 28px;
+  padding: 16px 18px;
+
+  border: 1px solid rgba(113, 147, 197, 0.28);
+  border-radius: 17px;
+
+  background:
+    linear-gradient(
+      100deg,
+      #102a46,
+      #172f59
+    );
+
+  color: #ffffff;
+
+  font-size: 17px;
+  font-weight: 900;
+
+  box-shadow:
+    0 11px 26px rgba(0, 0, 0, 0.2);
+
+  transition:
+    transform 0.18s ease,
+    filter 0.18s ease;
+}
+
+.secondary:hover {
+  filter: brightness(1.08);
+}
+
+.secondary:active {
+  transform: translateY(1px);
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 600px) {
+  .shell {
+    padding: 24px 15px 42px;
+  }
+
+  .tikino-header,
+  .hero {
+    margin-bottom: 27px;
+  }
+
+  .header-logo,
+  .main-logo {
+    width: 145px;
+    margin-bottom: 20px;
+  }
+
+  .tikino-header h1,
+  .hero h1 {
+    font-size: 27px;
+  }
+
+  .event-card {
+    padding: 22px 20px;
+    border-radius: 23px;
+  }
+
+  .event-card h2 {
+    margin-top: 17px;
+    font-size: 19px;
+  }
+
+  .event-card p {
+    font-size: 14px;
+  }
+
+  .event-card strong {
+    font-size: 20px;
+  }
+
+  .checkout {
+    padding: 21px 20px;
+    border-radius: 24px;
+  }
+
+  .checkout > div,
+  .checkout > label {
+    min-height: 54px;
+    padding: 12px 0;
+  }
+
+  .ticket-page {
+    padding-top: 17px;
+  }
+
+  .ticket-card {
+    padding: 27px 19px 23px;
+    border-radius: 28px;
+  }
+
+  .ticket-logo {
+    width: 145px;
+    margin-bottom: 26px;
+  }
+
+  .event-pass {
+    margin-bottom: 21px;
+    font-size: 13px;
+    letter-spacing: 5px;
+  }
+
+  .ticket-title,
+  .ticket-card h1 {
+    font-size: 23px;
+  }
+
+  .ticket-type,
+  .ticket-card > p {
+    font-size: 15px;
+  }
+
+  .ticket-divider {
+    margin: 22px 0;
+  }
+
+  .qr-wrap {
+    padding: 8px;
+    border-radius: 20px;
+  }
+
+  .qr-wrapper canvas,
+  .qr-wrapper svg {
+    width: 190px !important;
+    height: 190px !important;
+  }
+
+  .ticket-code {
+    min-height: 52px;
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  .ticket-details dt,
+  .ticket-details dd,
+  .ticket-card dt,
+  .ticket-card dd {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 360px) {
+  .shell {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .header-logo,
+  .main-logo {
+    width: 130px;
+  }
+
+  .tikino-header h1,
+  .hero h1 {
+    font-size: 24px;
+  }
+
+  .event-card {
+    padding: 20px 17px;
+  }
+
+  .checkout {
+    padding: 19px 17px;
+  }
+
+  .qr-wrapper canvas,
+  .qr-wrapper svg {
+    width: 170px !important;
+    height: 170px !important;
+  }
+
+  .ticket-details > div,
+  .ticket-card dl > div {
+    gap: 10px;
+  }
+}
